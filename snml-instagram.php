@@ -160,7 +160,7 @@
             if( !$debug ) :
                 $this->saveResponse( $response['body'] );
             else :
-                $this->printResponse( $response['body'] );
+                $this->printResponse( $response );
             endif;
         }
 
@@ -374,7 +374,7 @@
                 $this->setSubscriptionId( $parsedData->data->id );
             endif;
 
-            $this->printResponse( $response['body'] );
+            $this->printResponse( $response );
         }
 
         private function cancelSubscription( $subscriptionId = 0 ){
@@ -390,7 +390,7 @@
 
             $this->setSubscriptionId( 0 );
 
-            $this->printResponse( $response['body'] );
+            $this->printResponse( $response );
         }
 
         private function printResponse( $result ){
