@@ -1,8 +1,8 @@
 <?php
     /*
-    Plugin Name: Supernormal instagram
-    Description: Creates posts from a instagram hashtag
-    Version: 0.1
+    Plugin Name: Supernormal Instagram
+    Description: Creates posts from a Instagram hashtag or user
+    Version: 0.2.3
     Author: Supernormal
     Author URI: http://supernormal.se
     */
@@ -24,6 +24,7 @@
 
             add_action( 'init', array( $this, 'registerCustomPostType' ) );
             add_action( 'init', array( $this, 'registerCustomTaxonomies' ) );
+            add_action( 'init', array( $this, 'authRedirect' ) );
             add_action( 'admin_menu', array( $this, 'createOptionsPage' ) );
 
             add_action( 'add_meta_boxes', array( $this, 'registerMetaBoxes' ) );
@@ -72,6 +73,18 @@
             );
 
             register_taxonomy( 'tags', 'instagram', $tagsArguments );
+
+            $userLabels = array(
+                'name' => __( 'Users', self::$textDomain ),
+                'singular_name' => __( 'User', self::$textDomain )
+            );
+
+            $userArguments = array(
+                'hierarchial' => false,
+                'labels' => $userLabels
+            );
+
+            register_taxonomy( 'users', 'instagram', $userArguments );
         }
 
         public function createOptionsPage(){
@@ -130,14 +143,61 @@
         }
 
         public function handleSubscription( $debug = false ){
-            $fullUrl = self::$instagramApiBaseUrl . 'tags/' . $this->getHashtag() . '/media/recent?client_id=' . $this->getClientId();
-            $response = file_get_contents( $fullUrl );
+            $fullUrl = self::$instagramApiBaseUrl;
+
+            if( $this->getUserId() ) :
+                $fullUrl .= '/users/' . $this->getUserId() . '/media/recent?access_token=' . $this->getAccessToken();
+            else :
+                $fullUrl .= 'tags/' . $this->getHashtag() . '/media/recent?client_id=' . $this->getClientId();
+            endif;
+
+            $response = wp_remote_get( $fullUrl );
+
+            if( is_wp_error( $response ) ) :
+                return;
+            endif;
 
             if( !$debug ) :
-                $this->saveResponse( $response );
+                $this->saveResponse( $response['body'] );
             else :
-                $this->printResponse( $response );
+                $this->printResponse( $response['body'] );
             endif;
+        }
+
+        public function authRedirect(){
+            if( isset( $_POST[ 'action' ] ) AND $_POST[ 'action' ] === 'authentication' ) :
+                $fullUrl = 'https://api.instagram.com/oauth/authorize/?client_id=' . $this->getClientId() . '&redirect_uri=' . $this->getCallbackUrl() . '&response_type=code';
+
+                wp_redirect( $fullUrl );
+                die();
+            endif;
+        }
+
+        public function authenticate( $code ){
+            $vars = array(
+                'client_id' => $this->getClientId(),
+                'client_secret' => $this->getClientSecret(),
+                'code' => $code,
+                'grant_type' => 'authorization_code',
+                'redirect_uri' => $this->getCallbackUrl()
+            );
+
+            $response = wp_remote_post( 'https://api.instagram.com/oauth/access_token', array(
+                'body' => $vars
+            ) );
+
+            if( is_wp_error( $response ) ) :
+                return;
+            endif;
+
+            $response = json_decode( $response['body'] );
+
+            if( $response->access_token ) :
+                $this->setAccessToken( $response->access_token );
+            endif;
+
+            wp_redirect( admin_url( 'edit.php?post_type=instagram&page=settings' ) );
+            die();
         }
 
         public function loadAllPosts( $fullUrl = false ){
@@ -259,8 +319,11 @@
                 update_post_meta( $postId, $key, $value );
             endforeach;
 
+            do_action('snml_instagram_save', $postId);
+
             wp_set_object_terms( $postId, $media->filter, 'filters', true );
             wp_set_object_terms( $postId, $media->tags, 'tags', true );
+            wp_set_object_terms( $postId, $media->user->username, 'users', true );
 
             $this->addPostResult( $media->key, 'Post added' );
 
@@ -279,46 +342,39 @@
         }
 
         private function createSubscription(){
+            if( $this->getUsername() ) :
+                $object = 'user';
+                $object_id = '';
+            else :
+                $object = 'tag';
+                $object_id = $this->getHashtag();
+            endif;
+
             $vars = array(
                 'client_id' => $this->getClientId(),
                 'client_secret' => $this->getClientSecret(),
-                'object' => 'tag',
-                'object_id' => $this->getHashtag(),
+                'object' => $object,
+                'object_id' => $object_id,
                 'aspect' => 'media',
                 'verify_token' => 'hashtagInstagramSubscription',
-                'callback_url' => plugin_dir_url( __FILE__ ) . 'instagram-callback.php'
+                'callback_url' => $this->getCallbackUrl()
             );
 
-            $fields_string = '';
+            $response = wp_remote_post( self::$instagramSubscriptionsBaseUrl, array(
+                'body' => $vars
+            ) );
 
-            foreach( $vars as $key => $value) :
-                $fields_string .= $key .'='. $value . '&';
-            endforeach;
+            if( is_wp_error( $response ) ) :
+                return;
+            endif;
 
-            rtrim( $fields_string, '&' );
-
-            //open connection
-            $ch = curl_init();
-
-            //set the url, number of POST vars, POST data
-            curl_setopt( $ch, CURLOPT_URL, self::$instagramSubscriptionsBaseUrl );
-            curl_setopt( $ch, CURLOPT_POST, count( $vars ) );
-            curl_setopt( $ch, CURLOPT_POSTFIELDS, $fields_string );
-            curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1 );
-
-            //execute post
-            $result = curl_exec($ch);
-
-            //close connection
-            curl_close($ch);
-
-            $parsedData = json_decode( $result );
+            $parsedData = json_decode( $response['body'] );
 
             if( $parsedData->meta->code === 200 ) :
                 $this->setSubscriptionId( $parsedData->data->id );
             endif;
 
-            $this->printResponse( $result );
+            $this->printResponse( $response['body'] );
         }
 
         private function cancelSubscription( $subscriptionId = 0 ){
@@ -326,25 +382,15 @@
                 $subscriptionId = $this->getSubscriptionId();
             endif;
 
-            $curlUrl = self::$instagramSubscriptionsBaseUrl . '?client_id=' . $this->getClientId() . '&client_secret=' . $this->getClientSecret() . '&id=' . $subscriptionId;
+            $fullUrl = self::$instagramSubscriptionsBaseUrl . '?client_id=' . $this->getClientId() . '&client_secret=' . $this->getClientSecret() . '&id=' . $subscriptionId;
 
-            //open connection
-            $ch = curl_init();
-
-            //set the url, number of POST vars, POST data
-            curl_setopt( $ch, CURLOPT_URL, $curlUrl );
-            curl_setopt( $ch, CURLOPT_CUSTOMREQUEST, 'DELETE' );
-            curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1 );
-
-            //execute post
-            $result = curl_exec($ch);
-
-            //close connection
-            curl_close($ch);
+            $response = wp_remote_request( $fullUrl, array(
+                'method' => 'DELETE'
+            ) );
 
             $this->setSubscriptionId( 0 );
 
-            $this->printResponse( $result );
+            $this->printResponse( $response['body'] );
         }
 
         private function printResponse( $result ){
