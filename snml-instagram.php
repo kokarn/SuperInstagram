@@ -145,6 +145,7 @@
         public function handleSubscription( $debug = false ){
             $fullUrl = self::$instagramApiBaseUrl;
 
+            // Decide whether to recent media form a user or a hashtag
             if( $this->getUserId() ) :
                 $fullUrl .= '/users/' . $this->getUserId() . '/media/recent?access_token=' . $this->getAccessToken();
             else :
