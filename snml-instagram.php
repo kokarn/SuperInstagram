@@ -686,6 +686,10 @@
         private function setSubscriptionId( $subscriptionId ){
             return update_option( self::$prefix . '_subscription_id', $subscriptionId );
         }
+
+        private function getCallbackUrl(){
+            return plugin_dir_url( __FILE__ ) . 'instagram-callback.php';
+        }
     }
 
     new SnmlInstagram();
