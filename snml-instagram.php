@@ -394,18 +394,23 @@
             $this->printResponse( $response );
         }
 
-        private function printResponse( $result ){
-            $jsonResult = json_decode( $result );
-            if( $jsonResult !== null ) :
-                $message = $jsonResult;
-                if( $jsonResult->meta->code === 200 ) :
+        private function printResponse( $response ){
+            if( is_string( $response ) ) {
+                $result = json_decode( $response );
+            } else {
+                $result = null;
+            }
+
+            if( $result !== null ) :
+                $message = $result;
+                if( $result->meta->code === 200 ) :
                     $class = 'updated';
                 else :
                     $class = 'error';
                 endif;
             else :
                 $class = 'updated';
-                $message = $result;
+                $message = $response;
             endif;
             $this->printMessage( $message, $class );
         }
@@ -524,6 +529,27 @@
                             </td>
                         </tr>
                         <tr>
+                            <th scope="row">
+                                <label>
+                                    <?php
+                                        _e( 'Selected username', self::$textDomain );
+                                    ?>
+                                </label>
+                            </th>
+                            <td>
+                                @<input type="text" name="username" placeholder="<?php _e( 'username without @', self::$textDomain ); ?>" value="<?php echo $this->getUsername(); ?>">
+                                <em>
+                                    <?php
+                                        _e( 'Will be sanitized.', self::$textDomain );
+                                    ?>
+
+                                    <?php
+                                        _e( 'Will take precedence over hashtag.', self::$textDomain );
+                                    ?>
+                                </em>
+                            </td>
+                        </tr>
+                        <tr>
                             <td>
                             </td>
                             <td>
@@ -617,6 +643,21 @@
                 ?>
                 <h3>
                     <?php
+                        _e( 'Authentication', self::$textDomain );
+                    ?>
+                </h3>
+                <p>
+                    <form method="post">
+                        <input type="hidden" name="action" value="authentication">
+                        <button type="submit" class="button button-primary">
+                            <?php
+                                _e( 'Authenticate', self::$textDomain );
+                            ?>
+                        </button>
+                    </form>
+                </p>
+                <h3>
+                    <?php
                         _e( 'Debug', self::$textDomain );
                     ?>
                 </h3>
@@ -646,6 +687,33 @@
             if( isset( $_POST[ 'hashtag' ] ) ) :
                 $this->setHashtag( $_POST[ 'hashtag' ] );
             endif;
+
+            if( isset( $_POST[ 'username' ] ) ) :
+                $this->setUsername( $_POST[ 'username' ] );
+            endif;
+        }
+
+        private function fetchUserID( $username ){
+            $url = self::$instagramApiBaseUrl . 'users/search/?q=' . $username . '&client_id=' . $this->getClientId();
+            $response = wp_remote_get( $url );
+
+            if( is_wp_error( $response ) ) :
+                return;
+            endif;
+
+            $response = json_decode( $response['body'] );
+
+            $userId = 0;
+            foreach( $response->data as $user ) :
+                if( $user->username === $username ) :
+                    $userId = $user->id;
+                    break;
+                endif;
+            endforeach;
+
+            $this->setUserId( $userId );
+
+            return $userId;
         }
 
         private function getSubscriptions(){
@@ -670,6 +738,14 @@
             return update_option( self::$prefix . '_client_secret', $clientSecret );
         }
 
+        private function getAccessToken(){
+            return get_option( self::$prefix . '_access_token' );
+        }
+
+        private function setAccessToken( $accessToken ){
+            return update_option( self::$prefix . '_access_token', $accessToken );
+        }
+
         private function getHashtag(){
             return get_option( self::$prefix . '_hashtag' );
         }
@@ -678,6 +754,27 @@
             $hashtag = strtolower( $hashtag );
             $hashtag = preg_replace( '/[^a-z0-9äåö]/', '', $hashtag );
             return update_option( self::$prefix . '_hashtag', $hashtag );
+        }
+
+        private function getUsername(){
+            return get_option( self::$prefix . '_username' );
+        }
+
+        private function setUsername( $username ){
+            $username = strtolower( $username );
+            $username = preg_replace( '/[^a-z0-9äåö]/', '', $username );
+
+            $this->fetchUserID( $username );
+
+            return update_option( self::$prefix . '_username', $username );
+        }
+
+        private function getUserId(){
+            return get_option( self::$prefix . '_user_id' );
+        }
+
+        private function setUserId( $userId ){
+            return update_option( self::$prefix . '_user_id', $userId );
         }
 
         private function getSubscriptionId(){

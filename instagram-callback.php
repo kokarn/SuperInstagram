@@ -28,9 +28,13 @@
     if ( !isset( $table_prefix ) ):
         global $confroot;
         FindWPConfig( dirname( dirname( __FILE__ ) ) );
-        include_once $confroot . "/wp-config.php";
         include_once $confroot . "/wp-load.php";
     endif;
 
     $instagram = new SnmlInstagram();
-    $instagram->handleSubscription();
+
+    if( isset( $_GET['code'] ) ) :
+        $instagram->authenticate( $_GET['code'] );
+    else :
+        $instagram->handleSubscription();
+    endif;
