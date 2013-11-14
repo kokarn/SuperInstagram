@@ -297,6 +297,8 @@
             $parsedTitle = $this->parseTitle( $media->caption->text );
 
             $post = array(
+                'post_date' => date('Y-m-d H:i:s', $media->created_time),
+                'post_date_gmt' => gmdate('Y-m-d H:i:s', $media->created_time),
                 'post_type' => 'instagram',
                 'post_title' => $parsedTitle,
                 'post_status' => 'publish'
