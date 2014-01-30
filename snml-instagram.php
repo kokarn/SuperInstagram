@@ -525,7 +525,7 @@
                                 #<input type="text" name="hashtag" placeholder="<?php _e( 'hashtag without #', self::$textDomain ); ?>" value="<?php echo $this->getHashtag(); ?>">
                                 <em>
                                     <?php
-                                        _e( 'It will be sanitized', self::$textDomain );
+                                        _e( 'Will be sanitized', self::$textDomain );
                                     ?>
                                 </em>
                             </td>
