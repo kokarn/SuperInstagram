@@ -491,55 +491,55 @@
                     <table class="form-table">
                         <tr>
                             <th scope="row">
-                                <label>
+                                <label for="client-id">
                                     <?php
                                         _e( 'Client ID', self::$textDomain );
                                     ?>
                                 </label>
                             </th>
                             <td>
-                                <input type="text" name="client-id" placeholder="<?php _e( 'Client Id', self::$textDomain ); ?>" value="<?php echo $this->getClientId(); ?>">
+                                <input type="text" name="client-id" id="client-id" placeholder="<?php _e( 'Client Id', self::$textDomain ); ?>" value="<?php echo $this->getClientId(); ?>">
                             </td>
                         </tr>
                         <tr>
                             <th scope="row">
-                                <label>
+                                <label for="client-secret">
                                     <?php
                                         _e( 'Client secret', self::$textDomain );
                                     ?>
                                 </label>
                             </th>
                             <td>
-                                <input type="text" name="client-secret" placeholder="<?php _e( 'Client secret', self::$textDomain ); ?>" value="<?php echo $this->getClientSecret(); ?>">
+                                <input type="text" name="client-secret" id="client-secret" placeholder="<?php _e( 'Client secret', self::$textDomain ); ?>" value="<?php echo $this->getClientSecret(); ?>">
                             </td>
                         </tr>
                         <tr>
                             <th scope="row">
-                                <label>
+                                <label for="hashtag">
                                     <?php
                                         _e( 'Selected hashtag', self::$textDomain );
                                     ?>
                                 </label>
                             </th>
                             <td>
-                                #<input type="text" name="hashtag" placeholder="<?php _e( 'hashtag without #', self::$textDomain ); ?>" value="<?php echo $this->getHashtag(); ?>">
+                                #<input type="text" name="hashtag" id="hashtag" placeholder="<?php _e( 'hashtag without #', self::$textDomain ); ?>" value="<?php echo $this->getHashtag(); ?>">
                                 <em>
                                     <?php
-                                        _e( 'It will be sanitized', self::$textDomain );
+                                        _e( 'Will be sanitized', self::$textDomain );
                                     ?>
                                 </em>
                             </td>
                         </tr>
                         <tr>
                             <th scope="row">
-                                <label>
+                                <label for="username">
                                     <?php
                                         _e( 'Selected username', self::$textDomain );
                                     ?>
                                 </label>
                             </th>
                             <td>
-                                @<input type="text" name="username" placeholder="<?php _e( 'username without @', self::$textDomain ); ?>" value="<?php echo $this->getUsername(); ?>">
+                                @<input type="text" name="username" id="username" placeholder="<?php _e( 'username without @', self::$textDomain ); ?>" value="<?php echo $this->getUsername(); ?>">
                                 <em>
                                     <?php
                                         _e( 'Will be sanitized.', self::$textDomain );
