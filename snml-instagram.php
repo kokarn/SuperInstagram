@@ -747,7 +747,6 @@
 
         private function setHashtag( $hashtag ){
             $hashtag = strtolower( $hashtag );
-            $hashtag = preg_replace( '/[^a-z0-9äåö]/', '', $hashtag );
             return update_option( self::$prefix . '_hashtag', $hashtag );
         }
 
