@@ -313,7 +313,7 @@
             endif;
 
             if( !empty( $media->location ) ) :
-                $postMeta[ 'location' ] = json_encode( $media->location );
+                $postMeta[ 'instagram-location' ] = json_encode( $media->location );
             endif;
 
             $postId = wp_insert_post( $post );
