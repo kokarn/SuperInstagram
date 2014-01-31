@@ -2,7 +2,7 @@
     /*
     Plugin Name: Supernormal Instagram
     Description: Creates posts from a Instagram hashtag or user.
-    Version: 0.2.3
+    Version: 0.2.4
     Author: Supernormal
     Author URI: http://supernormal.se
     */
