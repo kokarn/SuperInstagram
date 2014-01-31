@@ -1,7 +1,7 @@
 <?php
     /*
     Plugin Name: Supernormal Instagram
-    Description: Creates posts from a Instagram hashtag or user
+    Description: Creates posts from a Instagram hashtag or user.
     Version: 0.2.3
     Author: Supernormal
     Author URI: http://supernormal.se
@@ -27,7 +27,6 @@
             add_action( 'admin_menu', array( $this, 'createOptionsPage' ) );
 
             add_action( 'add_meta_boxes', array( $this, 'registerMetaBoxes' ) );
-
         }
 
         public function flushRewriteRules(){
@@ -158,7 +157,7 @@
             endif;
 
             if( !$debug ) :
-                $this->saveResponse( $response['body'] );
+                $this->saveResponse( $response[ 'body' ] );
             else :
                 $this->printResponse( $response );
             endif;
@@ -190,7 +189,7 @@
                 return;
             endif;
 
-            $response = json_decode( $response['body'] );
+            $response = json_decode( $response[ 'body' ] );
 
             if( $response->access_token ) :
                 $this->setAccessToken( $response->access_token );
@@ -232,7 +231,6 @@
 
             // Pagination and next_url set
             $this->loadAllPosts( $extractData->pagination->next_url );
-
             return true;
         }
 
@@ -267,7 +265,6 @@
             $parsedTitle = apply_filters( 'the_title', $parsedTitle );
             $parsedTitle = preg_replace( '/\s+/', ' ', $parsedTitle );
             $parsedTitle = trim( $parsedTitle );
-
             return $parsedTitle;
         }
 
@@ -328,7 +325,6 @@
             wp_set_object_terms( $postId, $media->user->username, 'users', true );
 
             $this->addPostResult( $media->key, 'Post added' );
-
             return true;
         }
 
@@ -370,7 +366,7 @@
                 return;
             endif;
 
-            $parsedData = json_decode( $response['body'] );
+            $parsedData = json_decode( $response[ 'body' ] );
 
             if( $parsedData->meta->code === 200 ) :
                 $this->setSubscriptionId( $parsedData->data->id );
@@ -468,7 +464,7 @@
                                     $this->cancelSubscription( $_POST[ 'manualId' ] );
                                     break;
                                 case 'debug':
-                                    $this->handleSubscription( $debug = true );
+                                    $this->handleSubscription( true );
                                     break;
                                 case 'empty':
                                     $this->clearPosts();
@@ -702,7 +698,7 @@
                 return;
             endif;
 
-            $response = json_decode( $response['body'] );
+            $response = json_decode( $response[ 'body' ] );
 
             $userId = 0;
             foreach( $response->data as $user ) :
@@ -713,7 +709,6 @@
             endforeach;
 
             $this->setUserId( $userId );
-
             return $userId;
         }
 
@@ -772,7 +767,6 @@
             $username = preg_replace( '/[^a-z0-9äåö]/', '', $username );
 
             $this->fetchUserID( $username );
-
             return update_option( self::$prefix . '_username', $username );
         }
 
