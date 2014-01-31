@@ -308,6 +308,10 @@
             $postMeta[ 'instagram-link' ] = $media->link;
             $postMeta[ 'instagram-images' ] = json_encode( $media->images );
 
+            if (!empty($media->videos)) {
+                $postMeta['instagram-videos'] = json_encode($media->videos);
+            }
+
             if( !empty( $media->location ) ) :
                 $postMeta[ 'location' ] = json_encode( $media->location );
             endif;
