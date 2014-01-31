@@ -328,7 +328,7 @@
             wp_set_object_terms( $postId, $media->tags, 'tags', true );
             wp_set_object_terms( $postId, $media->user->username, 'users', true );
 
-            $this->addPostResult( $media->key, 'Post added' );
+            $this->addPostResult( $media->id, 'Post added' );
             return true;
         }
 
