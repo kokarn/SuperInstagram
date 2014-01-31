@@ -20,7 +20,7 @@
         return false;
     }
 
-    if( isset( $_GET[ 'hub_challenge' ] ) && isset( $_GET[ 'hub_verify_token' ] ) && $_GET[ 'hub_verify_token' ] == 'hashtagInstagramSubscription' ) :
+    if( isset( $_GET[ 'hub_challenge' ] ) && isset( $_GET[ 'hub_verify_token' ] ) && $_GET[ 'hub_verify_token' ] == 'snmlInstagramSubscription' ) :
         $challenge = $_GET[ 'hub_challenge' ];
         die( $challenge );
     endif;

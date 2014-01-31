@@ -354,7 +354,7 @@
                 'object' => $object,
                 'object_id' => $object_id,
                 'aspect' => 'media',
-                'verify_token' => 'hashtagInstagramSubscription',
+                'verify_token' => 'snmlInstagramSubscription',
                 'callback_url' => $this->getCallbackUrl()
             );
 
