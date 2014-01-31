@@ -2,9 +2,9 @@
     function FindWPConfig( $directory ){
         global $confroot;
 
-        foreach( glob( $directory . "/*" ) as $f ) :
+        foreach( glob( $directory . '/*' ) as $f ) :
             if ( basename( $f ) == 'wp-config.php' ) :
-                $confroot = str_replace( "\\", "/", dirname( $f ) );
+                $confroot = str_replace( '\\', '/', dirname( $f ) );
                 return true;
             endif;
             if ( is_dir( $f ) ) :
@@ -28,7 +28,7 @@
     if ( !isset( $table_prefix ) ):
         global $confroot;
         FindWPConfig( dirname( dirname( __FILE__ ) ) );
-        include_once $confroot . "/wp-load.php";
+        include_once $confroot . '/wp-load.php';
     endif;
 
     $instagram = new SnmlInstagram();

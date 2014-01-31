@@ -19,7 +19,6 @@
         }
 
         private function setupHooks(){
-
             register_activation_hook( __FILE__, array( $this, 'flushRewriteRules' ) );
 
             add_action( 'init', array( $this, 'registerCustomPostType' ) );
@@ -202,7 +201,6 @@
         }
 
         public function loadAllPosts( $fullUrl = false ){
-
             if( !$fullUrl ) :
                 $fullUrl = self::$instagramApiBaseUrl . 'tags/' . $this->getHashtag() . '/media/recent?client_id=' . $this->getClientId();
             endif;
@@ -262,33 +260,28 @@
             $parsedTitle = $this->instagramClean( $string );
             $parsedTitle = apply_filters( 'the_title', $parsedTitle );
             $parsedTitle = preg_replace( '/\s+/', ' ', $parsedTitle );
-            //$parsedTitle = preg_replace( '/\xEE[\x80-\xBF][\x80-\xBF]|\xEF[\x81-\x83][\x80-\xBF]/', '', $parsedTitle );
             $parsedTitle = trim( $parsedTitle );
 
             return $parsedTitle;
         }
 
         private function instagramClean( $text ) {
-
-            $clean_text = "";
-
             // Match Emoticons
             $regexEmoticons = '/[\x{1F600}-\x{1F64F}]/u';
-            $clean_text = preg_replace($regexEmoticons, '', $text);
+            $cleanText = preg_replace( $regexEmoticons, '', $text );
 
             // Match Miscellaneous Symbols and Pictographs
             $regexSymbols = '/[\x{1F300}-\x{1F5FF}]/u';
-            $clean_text = preg_replace($regexSymbols, '', $clean_text);
+            $cleanText = preg_replace( $regexSymbols, '', $cleanText );
 
-            // Match Transport And Map Symbols
+            // Match Transport and Map Symbols
             $regexTransport = '/[\x{1F680}-\x{1F6FF}]/u';
-            $clean_text = preg_replace($regexTransport, '', $clean_text);
+            $cleanText = preg_replace( $regexTransport, '', $cleanText );
 
-            return $clean_text;
+            return $cleanText;
         }
 
         private function createPost( $media ){
-
             if( $this->postExists( $media->id ) ) :
                 $this->addPostResult( $media->id, 'Post already exists' );
                 return false;
@@ -322,7 +315,7 @@
                 update_post_meta( $postId, $key, $value );
             endforeach;
 
-            do_action('snml_instagram_save', $postId);
+            do_action( 'snml_instagram_save', $postId );
 
             wp_set_object_terms( $postId, $media->filter, 'filters', true );
             wp_set_object_terms( $postId, $media->tags, 'tags', true );
