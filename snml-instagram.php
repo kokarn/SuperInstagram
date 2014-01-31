@@ -205,7 +205,13 @@
                 $fullUrl = self::$instagramApiBaseUrl . 'tags/' . $this->getHashtag() . '/media/recent?client_id=' . $this->getClientId();
             endif;
 
-            $response = file_get_contents( $fullUrl );
+            $response = wp_remote_get($fullUrl);
+
+            if (is_wp_error($response)) {
+                return;
+            }
+
+            $response = $response['body'];
 
             if( !$this->saveResponse( $response ) ):
                 // Failed to save responses (invalid json)
@@ -713,7 +719,13 @@
 
         private function getSubscriptions(){
             $url = self::$instagramSubscriptionsBaseUrl . '?client_secret=' . $this->getClientSecret() . '&client_id=' . $this->getClientId();
-            $data = file_get_contents( $url );
+            $response = wp_remote_get($url);
+
+            if (is_wp_error($response)) {
+                return;
+            }
+
+            $data = json_decode($response['body']);
             return $data;
         }
 
