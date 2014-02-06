@@ -54,7 +54,7 @@
             );
 
             $filtersArguments = array(
-                'hierarchial' => false,
+                'hierarchical' => false,
                 'labels' => $filtersLabels
             );
 
@@ -66,7 +66,7 @@
             );
 
             $tagsArguments = array(
-                'hierarchial' => false,
+                'hierarchical' => false,
                 'labels' => $tagsLabels
             );
 
@@ -78,7 +78,7 @@
             );
 
             $userArguments = array(
-                'hierarchial' => false,
+                'hierarchical' => false,
                 'labels' => $userLabels
             );
 
