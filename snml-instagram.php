@@ -101,6 +101,14 @@
         public function metaBoxData(){
             $meta = get_post_meta( get_the_ID() );
             ?>
+
+            <h4><?php _e( 'Image preview', self::$textDomain ); ?></h4>
+            <?php
+            $images = json_decode( $meta[ 'instagram_images' ][ 0 ] );
+            ?>
+
+            <a href="<?php echo $images->standard_resolution->url; ?>" target="_blank"><img src="<?php echo $images->thumbnail->url; ?>" alt=""></a>
+
             <table>
                 <?php
                     foreach( $meta as $key => $value ) :
