@@ -644,7 +644,7 @@
                             ?>
                         </h4>
                         <pre><?php
-                                print_r( json_decode(  $this->getSubscriptions() ) );
+                                print_r( $this->getSubscriptions() );
                             ?>
                         </pre>
                         <?php
