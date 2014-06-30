@@ -153,7 +153,7 @@
 
             // Decide whether to get recent media from a user or a hashtag
             if( $this->getUserId() ) :
-                $fullUrl .= '/users/' . $this->getUserId() . '/media/recent?access_token=' . $this->getAccessToken();
+                $fullUrl .= '/users/' . $this->getUserId() . '/media/recent?client_id=' . $this->getClientId();
             else :
                 $fullUrl .= 'tags/' . $this->getHashtag() . '/media/recent?client_id=' . $this->getClientId();
             endif;
