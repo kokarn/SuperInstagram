@@ -209,7 +209,14 @@
 
         public function loadAllPosts( $fullUrl = false ){
             if( !$fullUrl ) :
-                $fullUrl = self::$instagramApiBaseUrl . 'tags/' . $this->getHashtag() . '/media/recent?client_id=' . $this->getClientId();
+                $fullUrl = self::$instagramApiBaseUrl;
+
+                // Decide whether to get recent media from a user or a hashtag
+                if( $this->getUserId() ) :
+                    $fullUrl .= '/users/' . $this->getUserId() . '/media/recent?client_id=' . $this->getClientId();
+                else :
+                    $fullUrl .= 'tags/' . $this->getHashtag() . '/media/recent?client_id=' . $this->getClientId();
+                endif;
             endif;
 
             $response = wp_remote_get( $fullUrl );
